@@ -1,11 +1,11 @@
 import './App.css';
-import JokeGenerator from './components/JokeGenerator';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
     <>
-      <h1>Isar Aerospace</h1>
-      <JokeGenerator />
+      <h1>Spectrum</h1>
+      <Dashboard />
     </>
   );
 }
