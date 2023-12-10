@@ -28,14 +28,21 @@ const getGaugeData = (value, text, min, max) => {
 const Dashboard = () => {
   const [currentData, setCurrentData] = useState(null);
   const [allData, setAllData] = useState([]);
-
   const layout = { width: 300, height: 250, margin: { t: 0, b: 0 } };
+  const layoutLineChart = { width: 500, height: 300 };
+
+  const getLineChartData = (type) => {
+    return {
+      x: allData.map((d) => d.timestamp),
+      y: allData.map((d) => d[type]),
+      type: 'scatter',
+    };
+  };
 
   const update = () => {
     getData().then((res) => {
       setCurrentData(res.data);
       setAllData(allData.concat([{ ...res.data, timestamp: new Date() }]));
-
       const gaugeData = {
         velocity: getGaugeData(res.data.velocity, 'Velocity', -100, 100),
         altitude: getGaugeData(res.data.altitude, 'Altitude', -100000, 0),
@@ -47,9 +54,28 @@ const Dashboard = () => {
         ),
       };
 
+      const lineData = {
+        velocity: getLineChartData('velocity'),
+        altitude: getLineChartData('altitude'),
+        temperature: getLineChartData('temperature'),
+      };
+
       Plotly.newPlot('gauge-velocity', gaugeData.velocity, layout);
       Plotly.newPlot('gauge-altitude', gaugeData.altitude, layout);
       Plotly.newPlot('gauge-temperature', gaugeData.temperature, layout);
+
+      Plotly.newPlot('line-velocity', [lineData.velocity], {
+        title: 'Velocity',
+        ...layoutLineChart,
+      });
+      Plotly.newPlot('line-altitude', [lineData.altitude], {
+        title: 'Altitude',
+        ...layoutLineChart,
+      });
+      Plotly.newPlot('line-temperature', [lineData.temperature], {
+        title: 'Temperature',
+        ...layoutLineChart,
+      });
     });
   };
 
@@ -95,6 +121,11 @@ const Dashboard = () => {
         }}
       />
       <div>{currentData.isAscending ? 'Ascending' : 'Descending'}</div>
+      <Stack direction="row">
+        <div id="line-velocity"></div>
+        <div id="line-altitude"></div>
+        <div id="line-temperature"></div>
+      </Stack>
     </Box>
   );
 };
